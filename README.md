@@ -41,10 +41,9 @@ From a single wedding card to a full-scale web application, Clowee builds the te
 ---
 
 ## 🛠️ Technology Stack
-- **Frontend**: Next.js 15+ (App Router), TailwindCSS, Framer Motion.
-- **AI Layers**: Anthropic (Claude 3.5), OpenAI (GPT-4o), ElevenLabs (High-Fidelity Voice).
-- **Blockchain**: Stellar SDK, Soroban Smart Contracts (Simulated).
-- **Voice**: Web Speech API + Low-Latency Synthesis.
+- **AI Layers**: Anthropic (Claude 3.5 Sonnet), OpenAI (GPT-4o-mini), ElevenLabs (High-Fidelity Voice).
+- **Blockchain**: Stellar SDK, Soroban Smart Contracts (Trustless Work Protocol).
+- **Styling**: TailwindCSS 4, Framer Motion (Liquid visuals).
 
 ---
 
@@ -52,6 +51,34 @@ From a single wedding card to a full-scale web application, Clowee builds the te
 
 ### 1. Clone & Install
 ```bash
+git clone https://github.com/MaxCybOps/clowee-agentic-recruiter
+cd clowee-agentic-recruiter
+npm install
+```
+
+### 2. Environment Setup
+Create a `.env.local` file and add your keys:
+```env
+OPENAI_API_KEY=your_key
+ANTHROPIC_API_KEY=your_key
+ELEVENLABS_API_KEY=your_key
+ELEVENLABS_VOICE_ID=cgSgspJ2msm6clMCkdW9
+```
+
+### 3. Launch
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to start your first conversation.
+
+---
+
+## 💜 Acknowledgments
+Built with love for the **Boundless × Trustless Work Hackathon**. Special thanks to the Stellar and Trustless Work teams for the primitives that make secure agentic orchestration possible.
+
+---
+**Submission Description (50 chars):**
+*Voice-first agentic workforce secured by Stellar.*
 git clone https://github.com/MaxCybOps/clowee-agentic-recruiter.git
 cd clowee
 npm install

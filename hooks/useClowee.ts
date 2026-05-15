@@ -94,7 +94,6 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
           context: {
             userName,
             interactionCount,
-            historySummary,
             activeJobs: JSON.parse(activeJobs)
           }
         }),

@@ -545,9 +545,8 @@ export default function Dashboard() {
 
         <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-0">
           
-          {/* Refined Voice Powered Orb - Scaled Down for Elegance */}
-          <div className="relative w-[220px] h-[220px] md:w-[280px] md:h-[280px] flex items-center justify-center">
-            <div className="absolute inset-0 z-0">
+          <div className="relative w-[220px] h-[220px] md:w-[280px] md:h-[280px] flex items-center justify-center overflow-hidden rounded-full">
+            <div className="absolute inset-0 z-0 overflow-hidden rounded-full bg-black">
               <VoicePoweredOrb
                 enableVoiceControl={isListening}
                 className="rounded-full"

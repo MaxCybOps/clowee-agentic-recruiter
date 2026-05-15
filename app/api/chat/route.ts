@@ -69,7 +69,11 @@ export async function POST(req: Request) {
                      
                      If the user's goals or your relationship status have changed, 
                      provide a short "summary" update in your response.`,
-            messages: messages.filter((m: any) => m.role !== 'system'),
+            messages: messages.filter((m: any, i: number) => {
+              // Anthropic requires messages to alternate and start with 'user'
+              if (i === 0 && m.role === 'assistant') return false;
+              return m.role !== 'system';
+            }),
           })
         });
 

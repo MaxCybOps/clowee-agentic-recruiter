@@ -354,13 +354,21 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-[10px] text-white/60 font-mono">Escrow: ${job.amount} USDC</p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
                     <button 
                       onClick={() => setShowDeliverable(job)}
-                      className="text-[10px] font-bold text-accent-secondary hover:text-white transition-colors underline decoration-dotted"
+                      className="text-[10px] font-bold text-accent-secondary hover:text-white transition-colors underline decoration-dotted text-right"
                     >
                       {job.status === 'Ready for Review' ? 'Verify & Release' : 'View Brief'}
                     </button>
+                    <a 
+                      href={`https://viewer.trustlesswork.com/escrow/${job.id}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-[8px] text-white/30 hover:text-accent-primary transition-colors flex items-center justify-end gap-1"
+                    >
+                      <Shield className="w-2 h-2" /> View on Trustless Work
+                    </a>
                   </div>
                 </div>
               </motion.div>

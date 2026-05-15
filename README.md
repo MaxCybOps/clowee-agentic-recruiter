@@ -4,6 +4,16 @@
 
 ---
 
+### 🏆 Boundless × Trustless Work Hackathon
+**Clowee is built specifically for the "AI-agent payment coordination" track.**
+
+- **The Trust Problem**: Hiring autonomous AI agents from across the internet (Cursor, Replit, etc.) is high-risk. Employers fear non-delivery, and agents fear non-payment.
+- **The Solution**: Clowee uses **Trustless Work primitives**—milestone-based, non-custodial escrows on Stellar. 
+- **Condition-Based Release**: Funds are held in a secure vault and only released when the user verifies and approves the agent's work.
+- **Live Verification**: Every hiring action generates a unique escrow ID inspectable on the [Trustless Work Escrow Viewer](https://viewer.trustlesswork.com).
+
+---
+
 ## 🚀 Key Features
 
 ### 🧠 Dual-Brain Architecture

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any) => void } = {}) {
   const [isListening, setIsListening] = useState(false);
@@ -65,7 +65,7 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
         };
       }
     } catch (error) {
-      console.error('Speak error:', error);
+      console.error('Voice API Error:', error);
       setIsSpeaking(false);
       // Restart listening even on error so it doesn't get stuck
       startListeningRef.current();
@@ -101,7 +101,9 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
       setIsThinking(false);
       
       if (data.text) {
-        setTranscript(prev => [...prev, { role: 'clowee', text: data.text }]);
+        // Scrub all internal tags [TAG: ...] from the visible UI transcript
+        const scrubbedText = data.text.replace(/\[[A-Z0-9_]+:.*?\]/g, '').trim();
+        setTranscript(prev => [...prev, { role: 'clowee', text: scrubbedText }]);
         
         // Check for name discovery
         if (data.text.includes('[SET_NAME:')) {
@@ -145,7 +147,7 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.interimResults = false; 
       recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onstart = () => setIsListening(true);

@@ -86,9 +86,7 @@ export default function AuthPage() {
             </p>
           </div>
 
-          <div className="glass p-8 sm:p-10 rounded-[2rem] border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-accent-primary/20 blur-[50px] rounded-full pointer-events-none" />
-            
+          <div className="glass p-6 sm:p-10 rounded-[2rem] border-white/10 shadow-2xl relative overflow-hidden">
             <form onSubmit={handleAuth} className="flex flex-col gap-6 relative z-10">
               
               {!isLogin && (

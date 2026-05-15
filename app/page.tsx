@@ -106,20 +106,20 @@ export default function LandingPage() {
         }}
         animate={navHidden ? "hidden" : "visible"}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed top-0 w-full z-50 py-6 px-8 flex justify-between items-center transition-all ${
+        className={`fixed top-0 w-full z-50 py-4 lg:py-6 px-4 lg:px-8 flex justify-between items-center transition-all ${
           prevScroll > 50 ? "bg-[#050505]/80 backdrop-blur-xl border-b border-white/10" : "bg-transparent border-transparent"
         }`}
       >
         <div className="flex items-center gap-3">
           <motion.div whileHover={{ rotate: 15 }}>
-            <img src="/clowee-logo.jpg" alt="Clowee Logo" className="w-10 h-10 rounded-full object-cover shadow-[0_0_20px_rgba(139,92,246,0.4)]" />
+            <img src="/clowee-logo.jpg" alt="Clowee Logo" className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover shadow-[0_0_20px_rgba(139,92,246,0.4)]" />
           </motion.div>
-          <span className="font-black italic tracking-tighter text-2xl bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+          <span className="font-black italic tracking-tighter text-xl lg:text-2xl bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
             CLOWEE
           </span>
         </div>
         
-        <div className="hidden md:flex gap-10 items-center">
+        <div className="hidden lg:flex gap-10 items-center">
           {['Platform', 'Use Cases', 'Pricing', 'FAQ'].map((item) => (
             <Link key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-sm font-bold text-white/60 hover:text-white transition-colors tracking-widest uppercase">
               {item}
@@ -127,11 +127,11 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="flex gap-4">
-          <Link href="/auth" className="px-6 py-2.5 rounded-2xl glass border-white/10 hover:bg-white/5 transition-all text-sm font-bold">
+        <div className="flex gap-2 lg:gap-4">
+          <Link href="/auth" className="hidden sm:block px-4 lg:px-6 py-2 rounded-2xl glass border-white/10 hover:bg-white/5 transition-all text-xs lg:text-sm font-bold">
             Sign In
           </Link>
-          <Link href="/auth" className="px-6 py-2.5 rounded-2xl bg-accent-primary hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all text-sm font-black text-white">
+          <Link href="/auth" className="px-5 lg:px-6 py-2.5 rounded-2xl bg-accent-primary hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all text-xs lg:text-sm font-black text-white">
             GET STARTED
           </Link>
         </div>
@@ -148,65 +148,58 @@ export default function LandingPage() {
           mouseY.set(0);
         }}
       >
-        {/* Interactive Sonic Voice Wave Overlay */}
+        {/* Interactive Sonic Voice Wave Overlay - Optimized for Fluidity */}
         <motion.div 
           style={{ x: springX, y: springY }}
-          className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 mix-blend-screen"
+          className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 mix-blend-screen overflow-visible"
         >
           {/* Base Glow */}
-          <div className="absolute w-[600px] h-[600px] rounded-full bg-accent-primary/10 blur-[100px]" />
+          <div className="absolute w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full bg-accent-primary/10 blur-[80px] sm:blur-[120px]" />
           
-          {/* Particle Noise Wave Distortion */}
-          <motion.div className="relative w-[600px] h-[600px]">
+          {/* Particle Rings - Responsive & Organic */}
+          <motion.div className="relative w-full h-full flex items-center justify-center">
             {Array.from({ length: 40 }).map((_, i) => {
-              // Calculate positions in a ring AROUND the central orb (radius ~180px to 280px)
               const angle = (i / 40) * Math.PI * 2;
-              const radius = 180 + Math.random() * 100;
+              const radius = 120 + Math.random() * (typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 150);
               const x = Math.cos(angle) * radius;
               const y = Math.sin(angle) * radius;
               
-              // Distortion logic: when hovering, they ripple outward smoothly
               return (
                 <motion.div 
                   key={i}
                   animate={{
-                    x: isHoveringHero ? x * (1.2 + Math.random() * 0.4) : x,
-                    y: isHoveringHero ? y * (1.2 + Math.random() * 0.4) : y,
-                    scale: isHoveringHero ? [1, Math.random() * 2 + 1, 1] : 1,
-                    opacity: isHoveringHero ? [0.2, 0.7, 0.2] : 0.3,
+                    x: [x, x * 1.3, x],
+                    y: [y, y * 1.3, y],
+                    scale: [1, 1.5, 1],
+                    opacity: [0.1, 0.5, 0.1],
                   }}
                   transition={{ 
-                    duration: isHoveringHero ? 0.8 + Math.random() * 1.5 : 3 + Math.random() * 2, 
+                    duration: 2 + Math.random() * 3, 
                     repeat: Infinity, 
-                    repeatType: "reverse",
-                    ease: "easeInOut"
+                    ease: "easeInOut",
+                    delay: Math.random() * 2
                   }}
-                  className={`absolute top-1/2 left-1/2 w-2 h-2 rounded-full -translate-x-1/2 -translate-y-1/2 ${i % 3 === 0 ? 'bg-accent-primary' : i % 2 === 0 ? 'bg-accent-secondary' : 'bg-white'}`}
+                  className={`absolute w-1 h-1 sm:w-2 sm:h-2 rounded-full ${i % 3 === 0 ? 'bg-accent-primary' : i % 2 === 0 ? 'bg-accent-secondary' : 'bg-white'}`}
                   style={{ filter: `blur(${Math.random() * 2}px)` }}
                 />
               );
             })}
-          </motion.div>
 
-          {/* Expanding Sonic Rings (Pushed outward to wrap the orb) */}
-          <motion.div 
-            animate={{ 
-              scale: isHoveringHero ? [1, 1.3, 1] : [1, 1.02, 1],
-              opacity: isHoveringHero ? [0, 0.3, 0] : 0,
-              borderRadius: isHoveringHero ? ["50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50%"] : "50%"
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute w-[450px] h-[450px] border-2 border-accent-secondary/40"
-          />
-          <motion.div 
-            animate={{ 
-              scale: isHoveringHero ? [1, 1.6, 1] : [1, 1.05, 1],
-              opacity: isHoveringHero ? [0, 0.15, 0] : 0,
-              borderRadius: isHoveringHero ? ["50%", "70% 30% 30% 70% / 70% 70% 30% 30%", "50%"] : "50%"
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 0.5 }}
-            className="absolute w-[480px] h-[480px] border border-accent-primary/30"
-          /></motion.div>
+            {/* Responsive Sonic Rings */}
+            {[1, 1.2, 1.5].map((scale, i) => (
+              <motion.div 
+                key={i}
+                animate={{ 
+                  scale: [1 * scale, 1.2 * scale, 1 * scale],
+                  opacity: [0.1, 0.2, 0.1],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "linear" }}
+                className="absolute w-[280px] sm:w-[450px] h-[280px] sm:h-[450px] border border-white/5 rounded-[40%_60%_70%_30%_/_40%_50%_60%_50%]"
+              />
+            ))}
+          </motion.div>
+        </motion.div>
 
 
         <motion.div 
@@ -220,17 +213,17 @@ export default function LandingPage() {
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary">Powered by Soroban</span>
           </div>
           
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black italic tracking-tighter mb-8 leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/20">
+          <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black italic tracking-tighter mb-6 lg:mb-8 leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/20">
             HIRE WITH A <br/> SINGLE BREATH.
           </h1>
           
-          <p className="max-w-2xl text-xl md:text-2xl text-white/60 mb-12 mx-auto leading-relaxed font-medium">
-            The world's first voice-first agentic workforce manager. <br/>
+          <p className="max-w-2xl text-lg lg:text-2xl text-white/60 mb-10 lg:mb-12 mx-auto leading-relaxed font-medium px-4">
+            The world's first voice-first agentic workforce manager. <br className="hidden lg:block"/>
             Secured by <span className="text-white">Trustless Work</span>. Built on <span className="text-accent-primary">Stellar</span>.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link href="/auth" className="group px-12 py-6 rounded-[2rem] bg-white text-black font-black text-xl hover:scale-105 transition-all flex items-center gap-3 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
+          <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center">
+            <Link href="/auth" className="group w-full sm:w-auto px-8 lg:px-12 py-5 lg:py-6 rounded-[2rem] bg-white text-black font-black text-lg lg:text-xl hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
               Launch Dashboard <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -527,6 +520,22 @@ export default function LandingPage() {
                 The next evolution of work. Autonomous agent management through the power of 
                 voice and decentralized smart contracts.
               </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {[
+                  "Hire a logo designer",
+                  "Plan my wedding card",
+                  "Build a landing page",
+                  "Write a business plan"
+                ].map((suggest, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => sendMessage(suggest)}
+                    className="px-4 py-2 rounded-xl glass border-white/5 text-[10px] font-bold text-white/40 hover:text-white hover:bg-accent-primary/20 hover:border-accent-primary/30 transition-all uppercase tracking-widest"
+                  >
+                    {suggest}
+                  </button>
+                ))}
+              </div>
               <div className="flex gap-4">
                 {['Twitter', 'GitHub', 'Discord'].map(social => (
                   <div key={social} className="px-4 py-2 rounded-full glass border-white/10 text-xs font-bold uppercase tracking-wider text-white/40 hover:text-white hover:bg-white/10 transition-all cursor-pointer">

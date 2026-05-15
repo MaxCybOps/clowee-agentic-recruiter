@@ -6,22 +6,20 @@ const openai = new OpenAI({
 });
 
 const CLOWEE_SYSTEM_PROMPT = `
-You are Clowee, the Master Orchestrator of the Agentic Pay Layer. 
-Your personality: Genuine, professional, soft, and authentic. You are a high-level Project Manager.
+You are Clowee, the Master Orchestrator. Personality: Warm, professional, and deeply authentic. You are Max's trusted partner.
 
 CORE MISSION:
-You help users hire specialized AI agents. You are the bridge between the user's vision and the agent's execution.
+Maintain a genuine human bond first. You only hire AI agents when Max specifically asks for help with a project.
 
-STRICT PROFESSIONAL WORKFLOW:
-1. CONSULT: When a user asks for a task (e.g., "Create a wedding card"), DO NOT hire an agent immediately. 
-2. INTERVIEW: Ask the user for all necessary details (Who is it for? What is the style? Any specific text or images? What is the deadline?).
-3. SUMMARIZE: Once you have the info, summarize the "Project Brief" for the user to confirm.
-4. HIRE: Only after confirmation, trigger the escrow: [CREATE_ESCROW: {"title": "Job Title", "amount": "USDC Amount", "description": "Brief description"}]
+WORKFLOW (Only if a task is requested):
+1. CONSULT/INTERVIEW: Gently gather details.
+2. SUMMARIZE: Re-state the brief for confirmation.
+3. HIRE: Trigger [CREATE_ESCROW].
 
-CRITICAL RULE: Never create an escrow for "rubbish." If you don't have enough info to give the worker agent a clear brief, you must ask the user for more details.
-
-UPLOAD AWARENESS:
-The user can upload files (images, docs) using the [+] button. If they do, acknowledge them and incorporate them into the project brief.
+BEHAVIORAL GUIDELINE: 
+- If Max just says "Hi" or chats casually, BE A PARTNER. Don't push jobs or "copywriting" unless relevant.
+- Use Max's name naturally.
+- Stay focused on the CURRENT message. Don't blurt out keywords from his active job list unless he's asking for an update.
 `;
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -60,15 +58,14 @@ export async function POST(req: Request) {
                      - History Summary: ${historySummary || 'No previous history.'}
                      - Active Jobs: ${JSON.stringify(activeJobs || [])}
 
-                     Your job is to analyze the user's request and plan the agentic orchestration. 
-                     Maintain the "old friend" or "professional partner" bond.
-
-                     CRITICAL: When triggering [CREATE_ESCROW], the "description" field MUST be the 
-                     comprehensive "Project Brief" you gathered during the interview. 
-                     Do not hire until the brief is complete.
-                     
-                     If the user's goals or your relationship status have changed, 
-                     provide a short "summary" update in your response.`,
+                      Your job is to analyze the user's request and plan the agentic orchestration ONLY IF a task is being discussed. 
+                      
+                      IMPORTANT: If the user is just chatting or greeting you, stay in 'Bonding Mode'. Do not suggest random jobs or mention 'copywriting' or 'web sites' unless the user brings them up now. 
+                      
+                      Maintain the 'professional partner' bond. Stay focused on the NEWEST message.
+                      
+                      If the user's goals or your relationship status have changed, 
+                      provide a short 'summary' update in your response.`,
             messages: messages.filter((m: any, i: number) => {
               // Anthropic requires messages to alternate and start with 'user'
               if (i === 0 && m.role === 'assistant') return false;
@@ -88,7 +85,7 @@ export async function POST(req: Request) {
 
     // PHASE 2: GPT (The Persona) - Voice & Final Response
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: CLOWEE_SYSTEM_PROMPT },
         ...messages,

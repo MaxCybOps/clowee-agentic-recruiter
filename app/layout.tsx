@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   themeColor: '#050505',
 };
 
+import { SplashScreen } from "@/components/ui/splash-screen";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,6 +46,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased dark scroll-smooth">
       <body className={`${inter.variable} ${outfit.variable} font-outfit min-h-full flex flex-col bg-[#050505] text-white`}>
         <TrustlessWorkProvider>
+          <SplashScreen />
           {children}
         </TrustlessWorkProvider>
       </body>

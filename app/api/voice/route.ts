@@ -11,7 +11,9 @@ export async function POST(req: Request) {
     const { text, voiceId } = await req.json();
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
-    const actualVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || '21mOQcygkY7TYh8jt7oo';
+    const actualVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || 'piTKPmq9n4TpoDPs348P';
+
+    console.log('Voice Request:', { actualVoiceId, keyLength: apiKey?.length });
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${actualVoiceId}/stream`,
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           text,
-          model_id: 'eleven_turbo_v2_5',
+          model_id: 'eleven_multilingual_v2',
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,

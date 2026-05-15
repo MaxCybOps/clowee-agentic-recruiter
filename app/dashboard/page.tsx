@@ -67,7 +67,7 @@ export default function Dashboard() {
     transcript, 
     startListening, 
     stopListening, 
-    sendMessage, 
+    sendMessage: cloweeSendMessage, 
     audioRef,
     speak
   } = useClowee({
@@ -152,6 +152,16 @@ export default function Dashboard() {
       updateBalance(w.publicKey);
     }
   }, []);
+
+  const sendMessage = async (text: string) => {
+    try {
+      addLog(`[SYSTEM] Consulting Architect: Analyzing "${text.substring(0, 20)}..."`);
+      await cloweeSendMessage(text);
+      addLog("[SYSTEM] Persona established. Communicating response...");
+    } catch (err) {
+      addLog("[ERROR] Failed to connect to Clowee Intelligence.");
+    }
+  };
 
   const updateBalance = async (pubkey: string) => {
     try {
@@ -251,7 +261,7 @@ export default function Dashboard() {
   const activeCount = activeJobs.filter(j => j.status !== 'Completed').length;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#050505] text-white">
+    <>
       <audio ref={audioRef} className="hidden" muted={isMuted} />
 
       {/* Deliverable Modal */}
@@ -300,6 +310,31 @@ export default function Dashboard() {
       </AnimatePresence>
 
       {/* Autoplay Bypass Overlay */}
+    <div className="min-h-screen bg-black flex flex-col lg:flex-row text-white overflow-hidden font-sans selection:bg-accent-primary/30">
+      
+      {/* Mobile Header */}
+      <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between glass z-50 sticky top-0">
+        <div className="flex items-center gap-2">
+           <img src="/clowee-logo.jpg" alt="Clowee Logo" className="w-8 h-8 rounded-full object-cover" />
+           <h1 className="text-xl font-black italic tracking-tighter">CLOWEE</h1>
+        </div>
+        <div className="flex gap-2 items-center">
+           <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 font-black text-[10px] cursor-pointer">
+              <Plus className="w-3 h-3 text-accent-secondary" /> ATTACH
+              <input type="file" className="hidden" onChange={(e) => addLog(`[SYSTEM] Attached: ${e.target.files?.[0]?.name}`)} />
+           </label>
+           <button 
+              onClick={fundAccount}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-primary font-black text-[10px] shadow-lg"
+           >
+              <Plus className="w-3 h-3" /> FUND
+           </button>
+           <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-lg glass border-white/10 ml-1">
+              {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-accent-secondary" />}
+           </button>
+        </div>
+      </div>
+
       <AnimatePresence>
         {!hasWelcomed && (
           <motion.div 
@@ -318,13 +353,32 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside className="w-80 glass border-r border-white/10 p-6 flex flex-col gap-6 m-4 hidden lg:flex rounded-3xl">
+      {/* Sidebar - Responsive */}
+      <aside className="w-full lg:w-80 glass lg:border-r border-white/10 p-6 flex flex-col gap-6 lg:m-4 rounded-none lg:rounded-3xl h-auto lg:h-[calc(100vh-2rem)]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-accent-primary flex items-center justify-center shadow-lg shadow-accent-primary/20">
             <Briefcase className="text-white w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold tracking-tight">Active Jobs</h2>
+        </div>
+
+        {/* Process Monitor */}
+        <div className="glass p-4 rounded-2xl border-white/5 bg-accent-primary/5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-primary">Process Monitor</h3>
+            <div className="flex gap-1">
+               <div className="w-1 h-1 rounded-full bg-accent-primary animate-ping" />
+               <div className="w-1 h-1 rounded-full bg-accent-primary animate-ping delay-75" />
+            </div>
+          </div>
+          <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+            {systemLogs.slice(-4).map((log, i) => (
+              <div key={i} className="flex gap-2 items-start opacity-60">
+                 <div className="w-1 h-3 bg-accent-primary/40 rounded-full mt-0.5" />
+                 <p className="text-[9px] font-mono leading-tight">{log}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2 custom-scrollbar">
@@ -398,39 +452,45 @@ export default function Dashboard() {
           {wallet ? (
             <div className="flex flex-col gap-3">
               <div className="glass p-4 rounded-2xl border-white/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                  <button onClick={fundAccount} disabled={isFunding}>
-                    {isFunding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4 hover:text-accent-secondary" />}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-accent-primary/20 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-accent-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Clowee Vault</p>
+                      <p className="text-xl font-black italic tracking-tighter text-accent-secondary">{balance} XLM</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={fundAccount}
+                    disabled={isFunding}
+                    className="p-2.5 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 transition-all border border-accent-primary/20 group"
+                  >
+                    {isFunding ? <Loader2 className="w-4 h-4 animate-spin text-accent-primary" /> : <Plus className="w-5 h-5 text-accent-primary group-hover:scale-125 transition-transform" />}
                   </button>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent-primary/20 flex items-center justify-center">
-                    <Wallet className="w-5 h-5 text-accent-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Clowee Vault</p>
-                    <p className="text-xl font-black italic tracking-tighter text-accent-secondary">{balance} XLM</p>
-                  </div>
-                </div>
                 <div className="mt-4 pt-3 border-t border-white/5">
-                   <p className="text-[9px] text-white/20 truncate font-mono">{wallet.publicKey}</p>
+                   <p className="text-[9px] text-white/20 truncate font-mono opacity-60">{wallet.publicKey}</p>
                 </div>
               </div>
             </div>
           ) : (
-            <button 
-              onClick={connectWallet}
-              disabled={isConnecting}
-              className="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-accent-primary hover:scale-[1.02] transition-all font-bold text-sm shadow-[0_0_20px_rgba(139,92,246,0.3)]"
-            >
-              {isConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Wallet className="w-4 h-4" /> Connect Wallet</>}
-            </button>
-            <div className="mt-4 pt-4 border-t border-white/5">
-               <p className="text-[10px] text-white/30 leading-relaxed italic text-center">
-                 <Shield className="w-3 h-3 inline mr-1 mb-0.5" />
-                 Security: This is a non-custodial vault. Your keys are stored locally.
-               </p>
-            </div>
+            <>
+              <button 
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-accent-primary hover:scale-[1.02] transition-all font-bold text-sm shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+              >
+                {isConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Wallet className="w-4 h-4" /> Connect Wallet</>}
+              </button>
+              <div className="mt-4 pt-4 border-t border-white/5">
+                 <p className="text-[10px] text-white/30 leading-relaxed italic text-center">
+                   <Shield className="w-3 h-3 inline mr-1 mb-0.5" />
+                   Security: This is a non-custodial vault. Your keys are stored locally.
+                 </p>
+              </div>
+            </>
           )}
         </div>
       </aside>
@@ -464,14 +524,21 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all font-black text-xs cursor-pointer">
+              <Plus className="w-4 h-4 text-accent-secondary" /> ATTACH
+              <input type="file" className="hidden" onChange={(e) => addLog(`[SYSTEM] Attached: ${e.target.files?.[0]?.name}`)} />
+            </label>
+            <button 
+              onClick={fundAccount}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-primary hover:scale-105 transition-all font-black text-xs shadow-[0_0_25px_rgba(139,92,246,0.4)]"
+            >
+              <Plus className="w-4 h-4" /> FUND VAULT
+            </button>
             <button 
               onClick={() => setIsMuted(!isMuted)}
               className="p-3 rounded-xl glass hover:bg-white/10 transition-colors border-white/10"
             >
               {isMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-accent-secondary" />}
-            </button>
-            <button className="p-3 rounded-xl glass hover:bg-white/10 transition-colors border-white/10">
-              <Settings className="w-5 h-5 text-white/60" />
             </button>
           </div>
         </header>
@@ -496,25 +563,10 @@ export default function Dashboard() {
               <div className="absolute inset-0 bg-cover bg-center scale-110" style={{ backgroundImage: 'url("/orb-bg.png")' }} />
               <div className="absolute inset-0 bg-accent-primary/10 mix-blend-screen" />
             </motion.div>
-            {isThinking && (
-              <motion.div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-                <Loader2 className="w-8 h-8 text-white animate-spin opacity-50" />
-              </motion.div>
-            )}
           </div>
           
           <div className="text-center max-w-2xl min-h-[3rem] flex items-center justify-center z-10">
-            <AnimatePresence mode="wait">
-              {transcript.length > 0 && (
-                <motion.p
-                  key={transcript[transcript.length - 1].text}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                  className="text-xl font-bold text-white/90 italic px-8"
-                >
-                  "{transcript[transcript.length - 1].text}"
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {/* Transcript hidden for pure voice-first experience */}
           </div>
         </div>
 
@@ -536,10 +588,14 @@ export default function Dashboard() {
             <span className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1">Agent Suggestions</span>
             <div className="grid grid-cols-2 gap-1.5">
               {["Soroban Audit", "Logo Design", "Copywriting", "UX Research"].map((s, i) => (
-                <div key={i} className="bg-white/5 border border-white/5 rounded-lg p-1.5 flex flex-col hover:border-accent-primary/50 cursor-pointer">
-                   <span className="text-[9px] font-bold truncate">{s}</span>
+                <button 
+                  key={i} 
+                  onClick={() => sendMessage(`I need to hire an agent for ${s}`)}
+                  className="bg-white/5 border border-white/5 rounded-lg p-1.5 flex flex-col items-start hover:border-accent-primary/50 cursor-pointer transition-all hover:bg-accent-primary/5 group"
+                >
+                   <span className="text-[9px] font-bold truncate group-hover:text-accent-primary transition-colors">{s}</span>
                    <span className="text-[7px] text-white/30 uppercase">Agent Online</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -590,5 +646,6 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+    </>
   );
 }

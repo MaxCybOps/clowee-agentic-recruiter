@@ -17,22 +17,30 @@ export function useEscrowManager() {
     amount: string,
     workerAddress: string,
     title: string,
-    description: string
+    description: string,
+    signer: string
   }) => {
     try {
       setIsDeploying(true);
       
-      // In a real app, we would use the SDK's deploy functions.
-      // For the hackathon demo, we will simulate the transaction call
-      // or use the pre-built Blocks if possible.
+      const response = await fetch('/api/escrow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+
+      const data = await response.json();
       
-      console.log('Deploying escrow for:', params.title);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      if (!data.success) {
+        throw new Error(data.error || "Failed to deploy escrow");
+      }
+
       setIsDeploying(false);
-      return { success: true, escrowId: 'ESC-' + Math.random().toString(36).substr(2, 9) };
+      return { 
+        success: true, 
+        escrowId: data.escrowId,
+        unsignedTransaction: data.unsignedTransaction 
+      };
     } catch (error) {
       console.error('Escrow deployment error:', error);
       setIsDeploying(false);

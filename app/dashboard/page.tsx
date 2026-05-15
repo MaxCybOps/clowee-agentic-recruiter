@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX, Settings, Send, Plus, Briefcase, Shield, Loader2, Wallet, CheckCircle2, Keyboard, X } from 'lucide-react';
 import { useClowee } from '@/hooks/useClowee';
+import { useEscrowManager } from '@/hooks/useEscrowManager';
 import { createStellarAccount, fundTestnetAccount, getAccountBalance } from '@/lib/stellar';
 import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 
@@ -57,6 +58,8 @@ export default function Dashboard() {
     setSystemLogs(prev => [`[LOG] ${new Date().toLocaleTimeString()}: ${msg}`, ...prev.slice(0, 19)]);
   };
 
+  const { createEscrow, isDeploying } = useEscrowManager();
+
   const { 
     isListening, 
     isSpeaking, 
@@ -81,41 +84,56 @@ export default function Dashboard() {
         return;
       }
 
-      const newJob = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: params.title,
-        amount: params.amount,
-        description: params.description,
-        status: 'In Progress',
-        progress: 10,
-        // Mock deliverable based on title
-        deliverable: params.title.toLowerCase().includes('logo') || params.title.toLowerCase().includes('flier') 
-          ? { type: 'image', url: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1000' }
-          : { type: 'report', content: `## ${params.title} Report\nThis task was completed with 100% precision. All requirements met.` }
-      };
-      
-      setActiveJobs(prev => [...prev, newJob]);
+      // 2. Call Real API
       addLog(`Initializing ${params.title} agent...`);
-      addLog(`Creating Stellar Escrow for ${params.amount} USDC...`);
-      
-      // Simulate progress
-      setTimeout(() => {
-        addLog(`${params.title} agent scanning requirements...`);
-        setActiveJobs(prev => prev.map(job => job.id === newJob.id ? { ...job, progress: 45 } : job));
-      }, 3000);
+      addLog(`Connecting to Trustless Work API...`);
 
-      setTimeout(() => {
-        addLog(`${params.title} agent executing task...`);
-        setActiveJobs(prev => prev.map(job => job.id === newJob.id ? { ...job, progress: 85 } : job));
-      }, 7000);
+      createEscrow({
+        amount: params.amount,
+        workerAddress: "", // Agent address would go here
+        title: params.title,
+        description: params.description,
+        signer: wallet.publicKey
+      }).then((result) => {
+        const newJob = {
+          id: result.escrowId,
+          title: params.title,
+          amount: params.amount,
+          description: params.description,
+          status: 'In Progress',
+          progress: 10,
+          // Real Escrow Data
+          unsignedTransaction: result.unsignedTransaction,
+          deliverable: params.title.toLowerCase().includes('logo') || params.title.toLowerCase().includes('flier') 
+            ? { type: 'image', url: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1000' }
+            : { type: 'report', content: `## ${params.title} Report\nThis task was completed with 100% precision. All requirements met.` }
+        };
+        
+        setActiveJobs(prev => [...prev, newJob]);
+        addLog(`Real Escrow Initialized: ${result.escrowId}`);
 
-      setTimeout(() => {
-        addLog(`${params.title} task completed. Deliverable secured.`);
-        setActiveJobs(prev => prev.map(job => 
-          job.id === newJob.id ? { ...job, status: 'Ready for Review', progress: 100 } : job
-        ));
-        if (speak) speak(`${userName || 'Partner'}, the ${params.title} agent has finished the work. You can now view the deliverable in the sidebar.`);
-      }, 12000);
+        // 3. Simulate Agent Progress (since this is a demo)
+        setTimeout(() => {
+          addLog(`${params.title} agent scanning requirements...`);
+          setActiveJobs(prev => prev.map(job => job.id === newJob.id ? { ...job, progress: 45 } : job));
+        }, 3000);
+
+        setTimeout(() => {
+          addLog(`${params.title} agent executing task...`);
+          setActiveJobs(prev => prev.map(job => job.id === newJob.id ? { ...job, progress: 85 } : job));
+        }, 7000);
+
+        setTimeout(() => {
+          addLog(`${params.title} task completed. Deliverable secured.`);
+          setActiveJobs(prev => prev.map(job => 
+            job.id === newJob.id ? { ...job, status: 'Ready for Review', progress: 100 } : job
+          ));
+          if (speak) speak(`${userName || 'Partner'}, the ${params.title} agent has finished the work. You can now view the deliverable in the sidebar.`);
+        }, 12000);
+      }).catch(err => {
+        addLog(`API Error: ${err.message}`);
+        if (speak) speak("I encountered an error connecting to the escrow service. Please try again in a moment.");
+      });
     }
   });
 

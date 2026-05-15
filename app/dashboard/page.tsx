@@ -545,8 +545,8 @@ export default function Dashboard() {
 
         <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-0">
           
-          {/* Shrunk Voice Powered Orb */}
-          <div className="relative w-[250px] h-[250px] md:w-[350px] md:h-[350px] flex items-center justify-center">
+          {/* Refined Voice Powered Orb - Scaled Down for Elegance */}
+          <div className="relative w-[220px] h-[220px] md:w-[280px] md:h-[280px] flex items-center justify-center">
             <div className="absolute inset-0 z-0">
               <VoicePoweredOrb
                 enableVoiceControl={isListening}
@@ -558,10 +558,10 @@ export default function Dashboard() {
             <motion.div 
               animate={{ y: [-5, 5, -5], scale: isThinking ? [1, 1.05, 1] : 1 }}
               transition={{ y: { duration: 6, repeat: Infinity, ease: "easeInOut" }, scale: { duration: 1, repeat: Infinity } }}
-              className="absolute z-10 w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.3)] border-2 border-white/10"
+              className="absolute z-10 w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden shadow-[0_0_60px_rgba(139,92,246,0.2)] border-2 border-white/10"
             >
               <div className="absolute inset-0 bg-cover bg-center scale-110" style={{ backgroundImage: 'url("/orb-bg.png")' }} />
-              <div className="absolute inset-0 bg-accent-primary/10 mix-blend-screen" />
+              <div className="absolute inset-0 bg-accent-primary/5 mix-blend-screen" />
             </motion.div>
           </div>
           

@@ -66,15 +66,15 @@ export default function LandingPage() {
   const [isHoveringHero, setIsHoveringHero] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+  const springX = useSpring(mouseX, { stiffness: 150, damping: 40, mass: 2 });
+  const springY = useSpring(mouseY, { stiffness: 150, damping: 40, mass: 2 });
 
   const handleHeroMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    mouseX.set(x * 0.15); 
-    mouseY.set(y * 0.15);
+    mouseX.set(x * 0.6); // Increased for deep following
+    mouseY.set(y * 0.6); // Increased for deep following
   };
 
   // Orb Spin State
@@ -185,17 +185,22 @@ export default function LandingPage() {
               );
             })}
 
-            {/* Responsive Sonic Rings */}
-            {[1, 1.2, 1.5].map((scale, i) => (
+            {/* Responsive Sonic Rings - Deeper Distortion */}
+            {[1, 1.3, 1.7].map((scale, i) => (
               <motion.div 
                 key={i}
                 animate={{ 
-                  scale: [1 * scale, 1.2 * scale, 1 * scale],
-                  opacity: [0.1, 0.2, 0.1],
-                  rotate: [0, 180, 360]
+                  scale: [1 * scale, 1.25 * scale, 1 * scale],
+                  opacity: [0.05, 0.15, 0.05],
+                  rotate: [0, 180, 360],
+                  borderRadius: [
+                    "40% 60% 70% 30% / 40% 50% 60% 50%",
+                    "60% 40% 30% 70% / 50% 60% 40% 50%",
+                    "40% 60% 70% 30% / 40% 50% 60% 50%"
+                  ]
                 }}
-                transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "linear" }}
-                className="absolute w-[280px] sm:w-[450px] h-[280px] sm:h-[450px] border border-white/5 rounded-[40%_60%_70%_30%_/_40%_50%_60%_50%]"
+                transition={{ duration: 5 + i * 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute w-[280px] sm:w-[500px] h-[280px] sm:h-[500px] border border-accent-primary/20"
               />
             ))}
           </motion.div>
@@ -213,18 +218,18 @@ export default function LandingPage() {
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-secondary">Powered by Soroban</span>
           </div>
           
-          <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black italic tracking-tighter mb-6 lg:mb-8 leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/20">
-            HIRE WITH A <br/> SINGLE BREATH.
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black italic tracking-tighter mb-4 lg:mb-6 leading-[0.9] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 uppercase">
+            Hire with a <br/> Single Breath.
           </h1>
           
-          <p className="max-w-2xl text-lg lg:text-2xl text-white/60 mb-10 lg:mb-12 mx-auto leading-relaxed font-medium px-4">
+          <p className="max-w-xl text-md lg:text-xl text-white/50 mb-8 lg:mb-10 mx-auto leading-relaxed font-medium px-4 lg:px-0">
             The world's first voice-first agentic workforce manager. <br className="hidden lg:block"/>
-            Secured by <span className="text-white">Trustless Work</span>. Built on <span className="text-accent-primary">Stellar</span>.
+            Secured by <span className="text-white/80">Trustless Work</span>. Built on <span className="text-accent-primary/80">Stellar</span>.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center">
-            <Link href="/auth" className="group w-full sm:w-auto px-8 lg:px-12 py-5 lg:py-6 rounded-[2rem] bg-white text-black font-black text-lg lg:text-xl hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
-              Launch Dashboard <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/auth" className="group w-full sm:w-auto px-10 py-4 rounded-2xl bg-white text-black font-black text-sm lg:text-md hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-[0_15px_40px_rgba(255,255,255,0.05)]">
+              Launch Dashboard <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </motion.div>

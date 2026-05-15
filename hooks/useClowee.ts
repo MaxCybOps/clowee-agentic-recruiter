@@ -83,11 +83,14 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
       const userName = typeof window !== 'undefined' ? localStorage.getItem('clowee_user_name') || "Partner" : "Partner";
       const activeJobs = typeof window !== 'undefined' ? localStorage.getItem('clowee_active_jobs') || "[]" : "[]";
 
+      // Sliding Context Window: Only send the last 8 messages to keep responses fast and prevent memory breakage
+      const limitedMessages = newMessages.slice(-8);
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          messages: newMessages.map(m => ({ role: m.role === 'clowee' ? 'assistant' : 'user', content: m.text })),
+          messages: limitedMessages.map(m => ({ role: m.role === 'clowee' ? 'assistant' : 'user', content: m.text })),
           context: {
             userName,
             interactionCount,

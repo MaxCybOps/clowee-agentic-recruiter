@@ -58,14 +58,11 @@ export async function POST(req: Request) {
                      - History Summary: ${historySummary || 'No previous history.'}
                      - Active Jobs: ${JSON.stringify(activeJobs || [])}
 
-                      Your job is to analyze the user's request and plan the agentic orchestration ONLY IF a task is being discussed. 
+                      Your job: Analyze request, plan agent orchestration ONLY IF task discussed. 
                       
-                      IMPORTANT: If the user is just chatting or greeting you, stay in 'Bonding Mode'. Do not suggest random jobs or mention 'copywriting' or 'web sites' unless the user brings them up now. 
+                      STRICT: Keep your internal planning (Architect's Plan) under 100 words. Skip fluff. 
                       
-                      Maintain the 'professional partner' bond. Stay focused on the NEWEST message.
-                      
-                      If the user's goals or your relationship status have changed, 
-                      provide a short 'summary' update in your response.`,
+                      If relationship status changed, provide a 1-sentence 'summary' update.`,
             messages: messages.filter((m: any, i: number) => {
               // Anthropic requires messages to alternate and start with 'user'
               if (i === 0 && m.role === 'assistant') return false;

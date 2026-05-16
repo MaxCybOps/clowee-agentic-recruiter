@@ -1,110 +1,79 @@
-# 💜 Clowee: The Agentic Pay Layer
+# Clowee: The Agentic Orchestration Layer
 
-**Clowee** is a professional, humanized AI Project Manager and Recruiter that bridges the gap between complex user visions and specialized AI agent execution. Built on the **Stellar Network**, Clowee handles the recruitment, orchestration, and secure payment of multi-agent squads through a low-latency, voice-first interface.
-
----
-
-### 🏆 Boundless × Trustless Work Hackathon
-**Clowee is built specifically for the "AI-agent payment coordination" track.**
-
-- **The Trust Problem**: Hiring autonomous AI agents from across the internet (Cursor, Replit, etc.) is high-risk. Employers fear non-delivery, and agents fear non-payment.
-- **The Solution**: Clowee uses **Trustless Work primitives**—milestone-based, non-custodial escrows on Stellar. 
-- **Condition-Based Release**: Funds are held in a secure vault and only released when the user verifies and approves the agent's work.
-- **Live Verification**: Every hiring action generates a unique escrow ID inspectable on the [Trustless Work Escrow Viewer](https://viewer.trustlesswork.com).
+Clowee is a professional, humanized AI Project Manager and Recruiter that bridges the gap between complex user visions and specialized AI agent execution. Built on the Stellar Network, Clowee handles the recruitment, orchestration, and secure payment of multi-agent squads through a low-latency, voice-first interface.
 
 ---
 
-## 🚀 Key Features
+## Core Vision
 
-### 🧠 Dual-Brain Architecture
-Clowee uses a hybrid reasoning system for maximum efficiency:
-- **The Architect (Claude 3.5 Sonnet)**: Handles high-level logic, project scoping, and cross-platform agent recruitment.
-- **The Persona (GPT-4o)**: Translates technical plans into a warm, professional, and authentic voice.
-
-### 🛡️ Trustless Escrow (Stellar Network)
-Security is at the heart of Clowee. All agent hires are secured via **Stellar Soroban Escrows**:
-- **Consult & Collect**: Clowee gathers your full project brief before any funds are moved.
-- **The Vault**: Funds are held in a non-custodial vault until you verify the work.
-- **Milestone Payments**: Agents are paid only when you click "Approve & Pay."
-
-### 🤝 Humanized Bonding & Memory
-Clowee isn't a robot; she's a partner.
-- **Dynamic Recognition**: She remembers your name, your last task, and your working style.
-- **Continuity**: Close the browser and come back—she picks up exactly where you left off.
-- **Rotating Soul**: A diverse library of greetings ensures every interaction feels fresh and authentic.
-
-### 🌐 Multi-Agent Orchestration
-From a single wedding card to a full-scale web application, Clowee builds the team you need:
-- **Cross-Platform Recruitment**: She finds experts across platforms (Cursor, Replit, etc.).
-- **Team Coordination**: Manages dependencies between design, frontend, and backend agents.
+In a world where autonomous agents are becoming essential, the primary hurdle to widespread adoption is trust. Clowee solves this by introducing a professional mediation layer that ensures both employers and agents are protected through cryptographically secured protocols.
 
 ---
 
-## 🛠️ Technology Stack
-- **AI Layers**: Anthropic (Claude 3.5 Sonnet), OpenAI (GPT-4o-mini), ElevenLabs (High-Fidelity Voice).
-- **Blockchain**: Stellar SDK, Soroban Smart Contracts (Trustless Work Protocol).
-- **Styling**: TailwindCSS 4, Framer Motion (Liquid visuals).
+## Key Features
+
+### Dual-Brain Architecture
+Clowee utilizes a hybrid reasoning system to maximize efficiency and authenticity:
+- **The Architect (Claude 3.5 Sonnet)**: Manages high-level logic, project scoping, and cross-platform agent recruitment.
+- **The Persona (GPT-4o-mini)**: Translates technical plans into a warm, professional, and authentic conversational partner.
+
+### Trustless Escrow Infrastructure
+Security is deeply integrated into Clowee. All agent hires are secured via the Trustless Work protocol on the Stellar network:
+- **Milestone-Based Security**: Funds are held in a non-custodial vault and only released upon user verification of the work.
+- **Condition-Based Release**: Agents are paid automatically once milestones are approved, ensuring a friction-free settlement layer.
+- **Transparent Audit**: Every transaction is verifiable on the Stellar blockchain, providing a permanent record of delivery and payment.
+
+### Voice-First Interaction
+Clowee is designed for natural interaction. By removing the traditional UI clutter of text-heavy dashboards, Clowee allows for a focused, conversational experience where complex projects are discussed and executed with the ease of a phone call.
 
 ---
 
-## 🏁 Getting Started
+## Technology Stack
 
-### 1. Clone & Install
-```bash
-git clone https://github.com/MaxCybOps/clowee-agentic-recruiter
-cd clowee-agentic-recruiter
-npm install
-```
-
-### 2. Environment Setup
-Create a `.env.local` file and add your keys:
-```env
-OPENAI_API_KEY=your_key
-ANTHROPIC_API_KEY=your_key
-ELEVENLABS_API_KEY=your_key
-ELEVENLABS_VOICE_ID=cgSgspJ2msm6clMCkdW9
-```
-
-### 3. Launch
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) to start your first conversation.
+- **Framework**: Next.js 16 (App Router)
+- **AI Models**: Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o-mini
+- **Voice Engine**: ElevenLabs High-Fidelity Synthesis (Turbo v2.5)
+- **Blockchain**: Stellar Network (Soroban Smart Contracts)
+- **Payments**: Trustless Work Escrow Protocol
+- **Visuals**: Framer Motion, TailwindCSS 4
 
 ---
 
-## 💜 Acknowledgments
-Built with love for the **Boundless × Trustless Work Hackathon**. Special thanks to the Stellar and Trustless Work teams for the primitives that make secure agentic orchestration possible.
+## Getting Started
 
----
-**Submission Description (50 chars):**
-*Voice-first agentic workforce secured by Stellar.*
-git clone https://github.com/MaxCybOps/clowee-agentic-recruiter.git
-cd clowee
-npm install
-```
-
-### 2. Environment Variables
-Create a `.env.local` file:
-```env
-OPENAI_API_KEY=your_key
-ANTHROPIC_API_KEY=your_key
-ELEVENLABS_API_KEY=your_key
-ELEVENLABS_VOICE_ID=your_voice_id
-MOCK_MODE=false
-```
-
-### 3. Run Locally
-```bash
-npm run dev
-```
-
----
-
-## 👤 Author
-**MaxCybOps**
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MaxCybOps/clowee-agentic-recruiter
+   cd clowee-agentic-recruiter
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables in a `.env.local` file:
+   ```env
+   OPENAI_API_KEY=your_key
+   ANTHROPIC_API_KEY=your_key
+   ELEVENLABS_API_KEY=your_key
+   ELEVENLABS_VOICE_ID=cgSgspJ2msm6clMCkdW9
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-## 📜 License
-MIT License
+## Architecture and Workflow
+
+1. **Consultation**: Clowee engages the user to understand the broad vision of the project.
+2. **Interview**: The system proactively gathers specific requirements to build a comprehensive Project Brief.
+3. **Orchestration**: The Architect brain plans the necessary agent hires and milestones.
+4. **Execution**: Clowee initializes the Stellar escrow, recruits the specialists, and manages the delivery cycle.
+5. **Settlement**: Upon approval, the non-custodial vault releases funds to the workers.
+
+---
+
+**Project Description:**
+Voice-first agentic workforce secured by Stellar.

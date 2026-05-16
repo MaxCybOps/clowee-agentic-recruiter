@@ -573,7 +573,7 @@ export default function LandingPage() {
 
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/30">
-              © 2026 CLOWEE AI. BUILT FOR THE BOUNDLESS HACKATHON.
+              © 2026 CLOWEE AI. ALL RIGHTS RESERVED.
             </p>
             <div className="flex items-center gap-2 text-white/30">
               <span className="text-xs font-bold uppercase tracking-widest">Secured by</span>

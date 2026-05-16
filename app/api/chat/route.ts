@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   try {
     if (process.env.MOCK_MODE === 'true') {
       return NextResponse.json({ 
-        text: "I'm currently in Mock Mode, but I'm still as genuine as ever! How can I help you manage your agents today? 😊" 
+        text: "I'm currently in Mock Mode, but I'm still as genuine as ever! How can I help you manage your agents today?" 
       });
     }
 

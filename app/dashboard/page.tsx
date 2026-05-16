@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Volume2, VolumeX, Settings, Send, Plus, Briefcase, Shield, Loader2, Wallet, CheckCircle2, Keyboard, X } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, Settings, Send, Plus, Briefcase, Shield, Loader2, Wallet, CheckCircle2, Keyboard, X, Menu } from 'lucide-react';
 import { useClowee } from '@/hooks/useClowee';
 import { useEscrowManager } from '@/hooks/useEscrowManager';
 import { createStellarAccount, fundTestnetAccount, getAccountBalance } from '@/lib/stellar';
@@ -32,6 +32,7 @@ export default function Dashboard() {
   const [userName, setUserName] = useState<string | null>(null);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const [interactionCount, setInteractionCount] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const name = localStorage.getItem('clowee_user_name');
@@ -309,31 +310,127 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Autoplay Bypass Overlay */}
-    <div className="min-h-screen bg-black flex flex-col lg:flex-row text-white overflow-hidden font-sans selection:bg-accent-primary/30">
-      
-      {/* Mobile Header */}
-      <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between glass z-50 sticky top-0">
-        <div className="flex items-center gap-2">
-           <img src="/clowee-logo.jpg" alt="Clowee Logo" className="w-8 h-8 rounded-full object-cover" />
-           <h1 className="text-xl font-black italic tracking-tighter">CLOWEE</h1>
+      {/* Mobile Sidebar Overlay (Drawer) */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div 
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[60] bg-[#050505] p-6 lg:hidden overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-accent-primary flex items-center justify-center">
+                  <Briefcase className="text-white w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold tracking-tight">Active Jobs</h2>
+              </div>
+              <button onClick={() => setIsSidebarOpen(false)} className="p-2 glass rounded-xl border-white/10">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Sidebar Content Clone for Mobile */}
+            <div className="flex flex-col gap-6">
+               {/* Vault / Wallet Mobile */}
+               {wallet ? (
+                 <div className="glass p-4 rounded-2xl border-white/10 relative overflow-hidden bg-accent-primary/5">
+                   <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-accent-primary/20 flex items-center justify-center">
+                         <Wallet className="w-5 h-5 text-accent-primary" />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Vault</p>
+                         <p className="text-lg font-black text-accent-secondary">{balance} XLM</p>
+                       </div>
+                     </div>
+                     <button onClick={fundAccount} disabled={isFunding} className="p-2 rounded-lg bg-accent-primary/10 border border-accent-primary/20">
+                       {isFunding ? <Loader2 className="w-4 h-4 animate-spin text-accent-primary" /> : <Plus className="w-4 h-4 text-accent-primary" />}
+                     </button>
+                   </div>
+                 </div>
+               ) : (
+                 <button onClick={connectWallet} className="w-full p-4 rounded-xl bg-accent-primary font-bold text-sm">
+                   Connect Wallet
+                 </button>
+               )}
+
+               <div className="glass p-4 rounded-2xl border-white/5 bg-accent-primary/5">
+                 <div className="flex items-center justify-between mb-3">
+                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-primary">Process Monitor</h3>
+                   <div className="flex gap-1">
+                      <div className="w-1 h-1 rounded-full bg-accent-primary animate-ping" />
+                      <div className="w-1 h-1 rounded-full bg-accent-primary animate-ping delay-75" />
+                   </div>
+                 </div>
+                 <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+                   {systemLogs.slice(-6).map((log, i) => (
+                     <div key={i} className="flex gap-2 items-start opacity-60">
+                        <div className="w-1 h-3 bg-accent-primary/40 rounded-full mt-0.5" />
+                        <p className="text-[9px] font-mono leading-tight">{log}</p>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+
+               <div className="flex flex-col gap-4">
+                 {activeJobs.map((job) => (
+                   <motion.div key={job.id} className="glass p-4 rounded-2xl flex flex-col gap-3 border-white/5">
+                      {/* Job content same as sidebar */}
+                      <div className="flex justify-between items-start">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${
+                          job.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 'bg-accent-primary/20 text-accent-primary'
+                        }`}>
+                          {job.status}
+                        </span>
+                        <button onClick={() => { setShowDeliverable(job); setIsSidebarOpen(false); }} className="p-1 glass rounded hover:bg-white/10">
+                          <Send className="w-3 h-3 text-accent-secondary" />
+                        </button>
+                      </div>
+                      <p className="text-sm font-bold">{job.title}</p>
+                      <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                        <div className="h-full bg-accent-primary" style={{ width: `${job.progress}%` }} />
+                      </div>
+                   </motion.div>
+                 ))}
+               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="h-screen w-full bg-black flex flex-col lg:flex-row text-white overflow-hidden font-sans selection:bg-accent-primary/30">
+        
+        {/* Mobile Header (Fixed) */}
+        <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between glass z-50">
+          <div className="flex items-center gap-3">
+             <button onClick={() => setIsSidebarOpen(true)} className="p-2 glass rounded-xl border-white/10">
+                <Menu className="w-6 h-6" />
+             </button>
+             <h1 className="text-xl font-black italic tracking-tighter">CLOWEE</h1>
+          </div>
+          <div className="flex gap-2 items-center">
+             <button 
+                onClick={() => setIsMuted(!isMuted)} 
+                className="p-2 rounded-lg glass border-white/10"
+             >
+                {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-accent-secondary" />}
+             </button>
+             <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 font-black text-[10px] cursor-pointer">
+                <Plus className="w-3 h-3 text-accent-secondary" /> ATTACH
+                <input type="file" className="hidden" onChange={(e) => addLog(`Attached: ${e.target.files?.[0]?.name}`)} />
+             </label>
+             <button 
+                onClick={fundAccount}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-primary font-black text-[10px]"
+             >
+                <Plus className="w-3 h-3" /> FUND
+             </button>
+          </div>
         </div>
-        <div className="flex gap-2 items-center">
-           <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 font-black text-[10px] cursor-pointer">
-              <Plus className="w-3 h-3 text-accent-secondary" /> ATTACH
-              <input type="file" className="hidden" onChange={(e) => addLog(`[SYSTEM] Attached: ${e.target.files?.[0]?.name}`)} />
-           </label>
-           <button 
-              onClick={fundAccount}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-primary font-black text-[10px] shadow-lg"
-           >
-              <Plus className="w-3 h-3" /> FUND
-           </button>
-           <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-lg glass border-white/10 ml-1">
-              {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-accent-secondary" />}
-           </button>
-        </div>
-      </div>
 
       <AnimatePresence>
         {!hasWelcomed && (
@@ -353,8 +450,8 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Responsive */}
-      <aside className="w-full lg:w-80 glass lg:border-r border-white/10 p-6 flex flex-col gap-6 lg:m-4 rounded-none lg:rounded-3xl h-auto lg:h-[calc(100vh-2rem)]">
+      {/* Sidebar - Desktop (Always Visible), Mobile (Hidden) */}
+      <aside className="hidden lg:flex w-80 glass border-r border-white/10 p-6 flex-col gap-6 m-4 rounded-3xl h-[calc(100vh-2rem)]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-accent-primary flex items-center justify-center shadow-lg shadow-accent-primary/20">
             <Briefcase className="text-white w-5 h-5" />
@@ -497,22 +594,23 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col relative p-4 lg:p-8 overflow-hidden gap-4">
-        {/* Analytics Bar */}
-        <div className="grid grid-cols-3 gap-4 z-10">
-          <div className="glass p-4 rounded-2xl flex flex-col border-white/5">
-            <span className="text-[10px] text-white/40 font-black uppercase tracking-widest">Total Escrowed</span>
-            <span className="text-2xl font-black text-accent-primary">${totalEscrowed.toFixed(2)} <span className="text-xs font-normal text-white/20">USDC</span></span>
+        {/* Analytics Bar - Professional & Transparent */}
+        <div className="grid grid-cols-3 gap-2 lg:gap-4 z-10 w-full lg:max-w-4xl mx-auto">
+          <div className="glass p-3 lg:p-4 rounded-2xl flex flex-col border-white/5 items-center lg:items-start text-center lg:text-left">
+            <span className="text-[8px] lg:text-[10px] text-white/40 font-black uppercase tracking-widest">Escrowed</span>
+            <span className="text-sm lg:text-2xl font-black text-accent-primary">${totalEscrowed.toFixed(0)}</span>
           </div>
-          <div className="glass p-4 rounded-2xl flex flex-col border-white/5">
-            <span className="text-[10px] text-white/40 font-black uppercase tracking-widest">Active Agents</span>
-            <span className="text-2xl font-black text-accent-secondary">{activeCount} <span className="text-xs font-normal text-white/20">Running</span></span>
+          <div className="glass p-3 lg:p-4 rounded-2xl flex flex-col border-white/5 items-center lg:items-start text-center lg:text-left">
+            <span className="text-[8px] lg:text-[10px] text-white/40 font-black uppercase tracking-widest">Agents</span>
+            <span className="text-sm lg:text-2xl font-black text-accent-secondary">{activeCount}</span>
           </div>
-          <div className="glass p-4 rounded-2xl flex flex-col border-white/5">
-            <span className="text-[10px] text-white/40 font-black uppercase tracking-widest">Success Rate</span>
-            <span className="text-2xl font-black text-green-400">100% <span className="text-xs font-normal text-white/20">Verified</span></span>
+          <div className="glass p-3 lg:p-4 rounded-2xl flex flex-col border-white/5 items-center lg:items-start text-center lg:text-left">
+            <span className="text-[8px] lg:text-[10px] text-white/40 font-black uppercase tracking-widest">Success</span>
+            <span className="text-sm lg:text-2xl font-black text-green-400">100%</span>
           </div>
         </div>
-        <header className="flex justify-between items-center z-10">
+        
+        <header className="hidden lg:flex justify-between items-center z-10">
           <div className="flex items-center gap-3">
             <img src="/clowee-logo.jpg" alt="Clowee Logo" className="w-12 h-12 rounded-full object-cover shadow-[0_0_20px_rgba(139,92,246,0.4)]" />
             <div>

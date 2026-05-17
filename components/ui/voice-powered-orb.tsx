@@ -302,7 +302,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
-      container.appendChild(glContext.canvas);
+      container.appendChild(glContext.canvas as HTMLCanvasElement);
 
       const geometry = new Triangle(glContext);
       program = new Program(glContext, {
@@ -335,8 +335,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         if (width === 0 || height === 0) return;
 
         rendererInstance.setSize(width * dpr, height * dpr);
-        glContext.canvas.style.width = width + "px";
-        glContext.canvas.style.height = height + "px";
+        (glContext.canvas as HTMLCanvasElement).style.width = width + "px";
+        (glContext.canvas as HTMLCanvasElement).style.height = height + "px";
 
         if (program) {
           program.uniforms.iResolution.value.set(
@@ -407,8 +407,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         window.removeEventListener("resize", resize);
         if (container && glContext && glContext.canvas) {
           try {
-            if (container.contains(glContext.canvas)) {
-              container.removeChild(glContext.canvas);
+            if (container.contains(glContext.canvas as HTMLCanvasElement)) {
+              container.removeChild(glContext.canvas as HTMLCanvasElement);
             }
           } catch (error) {}
         }

@@ -196,7 +196,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
   const analyzeAudio = () => {
     if (!analyserRef.current || !dataArrayRef.current) return 0;
 
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
 
     // Calculate RMS (Root Mean Square) for better voice detection
     let sum = 0;

@@ -171,7 +171,7 @@ export default function LandingPage() {
           <Link href="#agents" className="hover:text-accent-primary transition-colors">Agents</Link>
           <Link href="#faq" className="hover:text-accent-primary transition-colors">FAQ</Link>
         </div>
-        <Link href="/dashboard" className="px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary text-black font-black text-[10px] sm:text-xs hover:scale-105 transition-transform flex items-center gap-1 sm:gap-1.5 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+        <Link href="/auth" className="px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary text-black font-black text-[10px] sm:text-xs hover:scale-105 transition-transform flex items-center gap-1 sm:gap-1.5 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
           Launch App <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         </Link>
       </motion.div>
@@ -283,7 +283,7 @@ export default function LandingPage() {
             </motion.p>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
-              <Link href="/dashboard" className="px-6 py-4 md:px-10 md:py-5 rounded-full bg-accent-primary text-black font-black text-sm md:text-lg hover:scale-105 transition-transform inline-flex items-center gap-2.5 sm:gap-3 shadow-[0_0_40px_rgba(139,92,246,0.5)]">
+              <Link href="/auth" className="px-6 py-4 md:px-10 md:py-5 rounded-full bg-accent-primary text-black font-black text-sm md:text-lg hover:scale-105 transition-transform inline-flex items-center gap-2.5 sm:gap-3 shadow-[0_0_40px_rgba(139,92,246,0.5)]">
                 Launch Clowee <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
               </Link>
             </motion.div>

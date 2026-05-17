@@ -45,7 +45,13 @@ export default function Dashboard() {
   const [attachedFiles, setAttachedFiles] = useState<{name: string, content: string}[]>([]);
 
   useEffect(() => {
-    const activeEmail = localStorage.getItem('clowee_active_email') || 'anonymous@clowee.ai';
+    const activeEmail = localStorage.getItem('clowee_active_email');
+    if (!activeEmail) {
+      // User is not authenticated, redirect to /auth
+      window.location.href = '/auth';
+      return;
+    }
+
     const name = localStorage.getItem(`clowee_user_name_${activeEmail}`) || localStorage.getItem('clowee_user_name');
     const seen = localStorage.getItem(`clowee_last_seen_${activeEmail}`);
     const count = parseInt(localStorage.getItem(`clowee_interaction_count_${activeEmail}`) || '0');

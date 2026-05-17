@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {},
+  turbopack: {
+    resolveAlias: {
+      fs: './lib/empty.ts',
+      net: './lib/empty.ts',
+      tls: './lib/empty.ts',
+      dns: './lib/empty.ts',
+      child_process: './lib/empty.ts',
+      'pg-native': './lib/empty.ts',
+    },
+  },
   images: {
     remotePatterns: [
       {

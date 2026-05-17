@@ -12,6 +12,9 @@ interface VoicePoweredOrbProps {
   maxRotationSpeed?: number;
   maxHoverIntensity?: number;
   onVoiceDetected?: (detected: boolean) => void;
+  isListening?: boolean;
+  isThinking?: boolean;
+  audioLevel?: number;
 }
 
 export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({

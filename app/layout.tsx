@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     description: 'The world\'s first voice-first agentic workforce manager. Secured by Trustless Work. Built on Stellar.',
     images: ['/hero-bg.jpg'],
   },
+};
+
+import type { Viewport } from "next";
+export const viewport: Viewport = {
   themeColor: '#050505',
 };
 

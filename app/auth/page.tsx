@@ -12,14 +12,23 @@ export default function AuthPage() {
   const router = useRouter();
 
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Save name for personalization if in signup mode, otherwise use a default or existing one
+    const cleanEmail = email.toLowerCase().trim() || 'anonymous@clowee.ai';
+    localStorage.setItem('clowee_active_email', cleanEmail);
+    
     if (!isLogin && name) {
+      localStorage.setItem(`clowee_user_name_${cleanEmail}`, name);
       localStorage.setItem('clowee_user_name', name);
+    } else {
+      const savedName = localStorage.getItem(`clowee_user_name_${cleanEmail}`);
+      if (savedName) {
+        localStorage.setItem('clowee_user_name', savedName);
+      }
     }
 
     // Simulate auth delay
@@ -109,6 +118,8 @@ export default function AuthPage() {
                   type="email" 
                   placeholder="name@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:outline-none focus:border-accent-primary focus:bg-white/10 transition-all font-medium"
                 />
               </div>

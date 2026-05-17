@@ -1,0 +1,18 @@
+**Soroban Audit Agent Hiring Criteria**
+
+1. **Scope of the Audit**: 
+   - Overview of system architecture
+   - Code quality assessment
+   - Security vulnerabilities
+   - Compliance with regulations
+   - Performance testing
+
+2. **Skills Required**: 
+   - Experience with Soroban framework
+   - Proficiency in smart contract auditing
+   - Strong understanding of blockchain security
+   - Knowledge of relevant regulations
+   - Previous experience with similar audits
+
+3. **Timeline**: 
+   - Start date: [Your input needed

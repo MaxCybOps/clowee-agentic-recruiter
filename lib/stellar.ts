@@ -38,3 +38,21 @@ export async function getAccountBalance(publicKey: string) {
     return [];
   }
 }
+
+/**
+ * Signs and submits an unsigned transaction XDR to the Stellar Testnet.
+ */
+export async function signAndSubmitTransaction(unsignedXdr: string, secretKey: string) {
+  const server = new StellarSdk.Horizon.Server('https://horizon-testnet.stellar.org');
+  try {
+    const pair = StellarSdk.Keypair.fromSecret(secretKey);
+    const tx = StellarSdk.TransactionBuilder.fromXDR(unsignedXdr, 'Test SDF Network ; September 2015');
+    tx.sign(pair);
+    const result = await server.submitTransaction(tx);
+    return { success: true, hash: result.hash };
+  } catch (error: any) {
+    console.error('Failed to sign/submit Stellar transaction:', error);
+    const detail = error.response?.data?.extras?.result_codes?.transaction || error.message;
+    throw new Error(detail || "Transaction failed");
+  }
+}

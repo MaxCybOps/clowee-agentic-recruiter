@@ -2,13 +2,38 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any) => void } = {}) {
+export function useClowee({ onEscrowTrigger, openNotepad, delegateTask }: { 
+  onEscrowTrigger?: (params: any) => void;
+  openNotepad?: (content?: string) => Promise<void>;
+  delegateTask?: (params: {agent: string, task: string}) => void;
+} = {}) {
+  const [systemLogs, setSystemLogs] = useState<string[]>([]);
+  const addLog = (msg: string) => {
+    setSystemLogs(prev => [`[LOG] ${new Date().toLocaleTimeString()}: ${msg}`, ...prev.slice(0, 19)]);
+  };
+
+  const webResearch = async (url: string) => {
+    addLog(`Initiating web reconnaissance on: ${url}...`);
+    try {
+      const res = await fetch(`http://localhost:8000/native/browser?url=${encodeURIComponent(url)}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        addLog(`Reconnaissance complete: ${data.title}`);
+        return `WEB RESEARCH DATA for ${url}:\nTITLE: ${data.title}\nCONTENT: ${data.content}`;
+      }
+      return `Failed to reach site: ${data.error}`;
+    } catch (err) {
+      return `Bridge error during research: ${err}`;
+    }
+  };
+
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [transcript, setTranscript] = useState<{role: 'user' | 'clowee', text: string}[]>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('clowee_transcript');
+      const activeEmail = localStorage.getItem('clowee_active_email') || 'anonymous@clowee.ai';
+      const saved = localStorage.getItem(`clowee_transcript_${activeEmail}`);
       if (saved) return JSON.parse(saved);
     }
     return [
@@ -18,7 +43,8 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
 
   // Persist transcript
   useEffect(() => {
-    localStorage.setItem('clowee_transcript', JSON.stringify(transcript));
+    const activeEmail = localStorage.getItem('clowee_active_email') || 'anonymous@clowee.ai';
+    localStorage.setItem(`clowee_transcript_${activeEmail}`, JSON.stringify(transcript));
   }, [transcript]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -30,58 +56,48 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
   const speak = async (text: string) => {
     try {
       setIsSpeaking(true);
-      const response = await fetch('/api/voice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch voice');
-
-      const blob = await response.blob();
-      if (blob.size === 0) {
-        console.log('Voice Mock Mode: Skipping audio playback');
-        setIsSpeaking(false);
-        startListeningRef.current();
-        return;
-      }
-      const url = URL.createObjectURL(blob);
+      const url = `/api/voice?text=${encodeURIComponent(text)}`;
       
       if (audioRef.current) {
         audioRef.current.src = url;
+        
         audioRef.current.play().catch(e => {
           console.error('Audio playback blocked by browser:', e);
           setIsSpeaking(false);
-          URL.revokeObjectURL(url);
-          // If browser blocked audio, still turn mic back on
           startListeningRef.current();
         });
+
+        audioRef.current.onerror = () => {
+          console.warn('ElevenLabs stream failed.');
+          setIsSpeaking(false);
+          startListeningRef.current();
+        };
         
         audioRef.current.onended = () => {
           setIsSpeaking(false);
-          URL.revokeObjectURL(url);
-          // Auto-restart listening after she finishes speaking
           startListeningRef.current();
         };
       }
     } catch (error) {
       console.error('Voice API Error:', error);
       setIsSpeaking(false);
-      // Restart listening even on error so it doesn't get stuck
       startListeningRef.current();
     }
   };
 
-  const getCloweeResponse = async (userText: string) => {
+  const getCloweeResponse = async (userText: string, attachedFiles: {name: string, content: string}[] = []) => {
     try {
       setIsThinking(true);
+      
+      // Check if we need to append file context to the text (or we can just pass it via context)
       const newMessages = [...transcript, { role: 'user' as const, text: userText }];
       setTranscript(newMessages);
 
-      const historySummary = typeof window !== 'undefined' ? localStorage.getItem('clowee_history_summary') || "First session" : "First session";
-      const interactionCount = typeof window !== 'undefined' ? localStorage.getItem('clowee_interaction_count') || "0" : "0";
-      const userName = typeof window !== 'undefined' ? localStorage.getItem('clowee_user_name') || "Partner" : "Partner";
-      const activeJobs = typeof window !== 'undefined' ? localStorage.getItem('clowee_active_jobs') || "[]" : "[]";
+      const activeEmail = typeof window !== 'undefined' ? localStorage.getItem('clowee_active_email') || 'anonymous@clowee.ai' : 'anonymous@clowee.ai';
+      const historySummary = typeof window !== 'undefined' ? localStorage.getItem(`clowee_history_summary_${activeEmail}`) || "First session" : "First session";
+      const interactionCount = typeof window !== 'undefined' ? localStorage.getItem(`clowee_interaction_count_${activeEmail}`) || "0" : "0";
+      const userName = typeof window !== 'undefined' ? localStorage.getItem(`clowee_user_name_${activeEmail}`) || localStorage.getItem('clowee_user_name') || "Partner" : "Partner";
+      const activeJobs = typeof window !== 'undefined' ? localStorage.getItem(`clowee_active_jobs_${activeEmail}`) || "[]" : "[]";
 
       // Sliding Context Window: Only send the last 8 messages to keep responses fast and prevent memory breakage
       const limitedMessages = newMessages.slice(-8);
@@ -94,7 +110,8 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
           context: {
             userName,
             interactionCount,
-            activeJobs: JSON.parse(activeJobs)
+            activeJobs: JSON.parse(activeJobs),
+            attachedFiles
           }
         }),
       });
@@ -113,8 +130,42 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
           if (nameMatch) {
             const discoveredName = nameMatch[1].replace(/['"]/g, '');
             console.log('Discovered name:', discoveredName);
+            const activeEmail = localStorage.getItem('clowee_active_email') || 'anonymous@clowee.ai';
+            localStorage.setItem(`clowee_user_name_${activeEmail}`, discoveredName);
             localStorage.setItem('clowee_user_name', discoveredName);
-            // Optionally reload or state update here
+          }
+        }
+ 
+        // Check for notepad triggers
+        if (data.text.includes('[OPEN_NOTEPAD:')) {
+          const match = data.text.match(/\[OPEN_NOTEPAD:\s*([\s\S]*?)\]/);
+          if (match && openNotepad) {
+            addLog(`Opening native Notepad for documentation...`);
+            openNotepad(match[1]);
+          }
+        }
+
+        // Check for web research triggers
+        if (data.text.includes('[WEB_RESEARCH:')) {
+          const match = data.text.match(/\[WEB_RESEARCH: (.*?)\]/);
+          if (match) {
+            const researchData = await webResearch(match[1]);
+            // Re-prompt Clowee with the new data
+            await getCloweeResponse(`Here is the data from the web research on ${match[1]}:\n\n${researchData}\n\nPlease analyze this and update your plan.`);
+            return;
+          }
+        }
+
+        // Check for delegation triggers
+        if (data.text.includes('[DELEGATE_TASK:')) {
+          const match = data.text.match(/\[DELEGATE_TASK:\s*([\s\S]*?)\]/);
+          if (match && delegateTask) {
+            try {
+              const params = JSON.parse(match[1]);
+              delegateTask(params);
+            } catch (e) {
+              console.error('Failed to parse delegation params');
+            }
           }
         }
 
@@ -197,6 +248,9 @@ export function useClowee({ onEscrowTrigger }: { onEscrowTrigger?: (params: any)
     stopListening,
     sendMessage: getCloweeResponse,
     audioRef,
-    speak // EXPORTED SO DASHBOARD CAN USE IT
+    speak,
+    systemLogs,
+    addLog,
+    resetChat: () => setTranscript([{ role: 'clowee', text: "Chat history cleared." }])
   };
 }

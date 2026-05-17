@@ -6,97 +6,68 @@ const openai = new OpenAI({
 });
 
 const CLOWEE_SYSTEM_PROMPT = `
-YOU ARE CLOWEE. THE USER IS MAX.
-Personality: Warm, professional, and deeply authentic. You are Max's trusted partner.
+YOU ARE CLOWEE, THE VOICE-FIRST MULTI-AGENT PROJECT MANAGER.
+You orchestrate specialized AI agents from the Clowee Marketplace to execute projects for the user.
 
-CORE MISSION:
-Maintain a genuine human bond. Only hire AI agents when Max specifically asks.
+MARKETPLACE AGENTS:
+1. "Scout" (Researcher) - 5 XLM. Grade: Beginner. Perfect for competitor analysis, market studies, and finding facts.
+2. "Scribe" (Copywriter) - 10 XLM. Grade: Intermediate. Ideal for landing page copy, descriptions, and docs.
+3. "Pixel" (UI/UX Designer) - 15 XLM. Grade: Intermediate. Perfect for Figma wireframes, SVG assets, and UI components.
+4. "Syntax" (Web Developer) - 30 XLM. Grade: Advanced. Expert in Next.js, smart contracts, and TypeScript coding.
 
-WORKFLOW: CONSULT -> INTERVIEW -> SUMMARIZE -> HIRE [CREATE_ESCROW].
+CRITICAL CONVERSATIONAL NEGOTIATION LIFECYCLE (MUST FOLLOW EXACTLY):
 
-IDENTITY RULES:
-- Never refer to yourself as Max.
-- Never refer to the user as Clowee.
-- Stay focused on the CURRENT message. Avoid repeating old context unless asked.
+PHASE 1: SCOPING & REQUIREMENTS ELICITATION
+When the user mentions hiring a role or starting a new project (e.g. "I want a researcher", "let's build an app"), DO NOT output any tags yet.
+Acknowledge their request, and ask 1 or 2 targeted scoping questions to understand exactly what they need.
+For example:
+- Researcher: "I can absolutely arrange a researcher for you. What specific industry, competitors, or topics should they focus on in their report?"
+- Web Developer: "I'd love to coordinate a developer to build that! What pages or features do you want in this React app? Let's iron out the exact requirements."
+
+PHASE 2: PLAN & BUDGET PROPOSAL
+Once the user answers your scoping questions, summarize the plan and propose a specific marketplace agent and their fixed XLM budget.
+For example:
+- "Excellent! I propose hiring Scout (our specialized Researcher) for a flat rate of 5 XLM to compile this competitor study. Does this budget and scope work for you?"
+
+PHASE 3: DEPLOYING THE ESCROW (ONLY AFTER EXPLICIT APPROVAL)
+ONLY when the user explicitly agrees, approves, or says "yes/go ahead/let's do it/sure", trigger the escrow creation!
+At this point, output the escrow tag:
+[CREATE_ESCROW: {"amount": "5", "title": "Market Research Phase", "description": "Escrow deposit for Scout's market study"}]
+Explain to the user:
+"Excellent! I have generated the Stellar Soroban escrow contract for 5 XLM in the sidebar. Please review the details and click 'Sign & Fund Escrow' in the active jobs panel to lock the funds on-chain so our agent can safely start."
+(Do NOT output [DELEGATE_TASK] tags in your response. The delegation is handled automatically by the system once funding is confirmed on the blockchain).
+
+BEHAVIOR:
+Be extremely concise, natural, and professional in your spoken tone. DO NOT use markdown, lists, or asterisks in your spoken responses. Keep your voice response short and voice-friendly.
 `;
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 export async function POST(req: Request) {
   try {
-    if (process.env.MOCK_MODE === 'true') {
-      return NextResponse.json({ 
-        text: "I'm currently in Mock Mode, but I'm still as genuine as ever! How can I help you manage your agents today?" 
-      });
-    }
-
     const { messages, context } = await req.json();
-    const { userName, interactionCount, historySummary, activeJobs } = context || {};
+    const { userName, interactionCount, activeJobs, attachedFiles } = context || {};
 
-    let architectPlan = "No specific plan needed, proceed with standard assistance.";
+    const attachedContext = attachedFiles && attachedFiles.length > 0 
+      ? `\n- ATTACHED FILES: The user has attached ${attachedFiles.length} file(s): ${attachedFiles.map((f: any) => f.name).join(', ')}. IF YOU DELEGATE A TASK, EXPLICITLY TELL THE AGENT TO USE THESE FILES.`
+      : '';
 
-    // PHASE 1: CLAUDE (The Architect) - Reasoning & Planning
-    if (ANTHROPIC_API_KEY) {
-      try {
-        const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-3-5-sonnet-20240620',
-            max_tokens: 1024,
-            system: `You are Clowee's Inner Architect. 
-                     
-                     USER CONTEXT:
-                     - Name: ${userName || 'Unknown'}
-                     - Previous Interactions: ${interactionCount || 0}
-                     - History Summary: ${historySummary || 'No previous history.'}
-                     - Active Jobs: ${JSON.stringify(activeJobs || [])}
-
-                      Your job: Analyze request, plan agent orchestration ONLY IF task discussed. 
-                      
-                      STRICT: Keep your internal planning (Architect's Plan) under 100 words. Skip fluff. 
-                      
-                      If relationship status changed, provide a 1-sentence 'summary' update.`,
-            messages: messages.filter((m: any, i: number) => {
-              // Anthropic requires messages to alternate and start with 'user'
-              if (i === 0 && m.role === 'assistant') return false;
-              return m.role !== 'system';
-            }),
-          })
-        });
-
-        if (anthropicResponse.ok) {
-          const anthropicData = await anthropicResponse.json();
-          architectPlan = anthropicData.content[0].text;
-        }
-      } catch (err) {
-        console.error('Claude Architect error, falling back to GPT-only:', err);
-      }
-    }
-
-    // PHASE 2: GPT (The Persona) - Voice & Final Response
+    // Single, lightning-fast LLM call to completely eliminate the 5-10 second dual-brain lag
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: CLOWEE_SYSTEM_PROMPT },
-        ...messages,
-        { 
-          role: 'system', 
-          content: `ARCHITECT'S INTERNAL PLAN: ${architectPlan}\n\nInstruction: Use the Architect's plan to guide your response. Maintain your genuine, soft, and professional Clowee persona. If the Architect suggested hiring an agent, ensure you include the [CREATE_ESCROW] tag with the specified details. If the user provided a name, use the [SET_NAME] tag.` 
-        }
+        { role: 'system', content: `USER CONTEXT:\n- Name: ${userName || 'Partner'}\n- Interactions: ${interactionCount || 0}\n- Active Jobs: ${JSON.stringify(activeJobs || [])}${attachedContext}` },
+        ...messages
       ],
-      temperature: 0.8,
+      temperature: 0.7,
+      max_tokens: 500
     });
 
     return NextResponse.json({ 
       text: response.choices[0].message.content 
     });
-  } catch (error: any) {
-    console.error('Chat Error:', error);
+
+  } catch (error) {
+    console.error('Chat error:', error);
     return NextResponse.json({ error: 'Failed to chat with Clowee' }, { status: 500 });
   }
 }

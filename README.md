@@ -1,5 +1,7 @@
 # CLOWEE: The Voice-First Decentralized Workforce Command Center
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-clowee--agentic--recruiter.vercel.app-7C3AED?style=for-the-badge&logo=vercel&logoColor=white)](https://clowee-agentic-recruiter.vercel.app/)
+
 Clowee is a voice-first, non-custodial AI Project Manager and Recruiter powered by the Stellar Network. By combining sub-200ms low-latency conversation with Soroban smart contract security, Clowee acts as a professional mediator that translates high-level user visions into coordinated multi-agent squads, securing their payments transparently on-chain.
 
 ---
